@@ -1,65 +1,114 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useOrders, useMenu } from '@/features/orders/hooks/use-orders';
-import { useSync } from '@/hooks/use-sync';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { UtensilsCrossed, ChevronRight, Settings2 } from 'lucide-react';
 
 export default function Home() {
-  const { isOnline } = useSync();
-  const { pendingOrders, createOrder } = useOrders();
-  const { data: menu } = useMenu();
-  const [mounted, setMounted] = useState(false);
+  const [cedula, setCedula] = useState('');
 
-  // Additional hydration safety
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return <div className="p-8 text-slate-500">Cargando aplicación...</div>;
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert('Próximamente: Consulta de pedidos por cédula.');
+  };
 
   return (
-    <main className="p-8 min-h-screen bg-slate-50 font-sans text-slate-900">
-      <div className="max-w-xl mx-auto space-y-8 bg-white p-8 rounded-2xl border border-slate-200 shadow-sm mt-10">
-        <header className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Backend Almuerzos - Tablet v1</h1>
+    <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans transition-colors duration-200">
+
+      {/* Header */}
+      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-950 dark:bg-zinc-900">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          {/* Brand */}
           <div className="flex items-center gap-3">
-            <span className={`h-3 w-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500 animate-pulse'}`} />
-            <p className="text-sm font-semibold uppercase tracking-wider">
-              {isOnline ? 'En línea (Sincronizado)' : 'Modo Offline (Almacenamiento Local)'}
-            </p>
+            <UtensilsCrossed size={16} className="text-zinc-500" />
+            <span className="font-black tracking-tighter text-2xl text-white leading-none">
+              TIMO.
+            </span>
           </div>
-        </header>
 
-        <section className="space-y-4 pt-4 border-t">
-          <h2 className="text-lg font-bold">Resumen de Estado</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-xs text-slate-500 uppercase font-black tracking-widest">Pendientes</p>
-              <p className="text-2xl font-bold">{pendingOrders.length}</p>
+          {/* Right Actions */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link
+              href="/admin/login"
+              className="group relative flex items-center gap-2 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all duration-200"
+              title="Acceso Administrativo"
+            >
+              <Settings2 size={18} className="group-hover:rotate-45 transition-transform duration-300" />
+              <span className="text-xs font-semibold uppercase tracking-widest hidden sm:block">Admin</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-6 py-12 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center min-h-[calc(100vh-4rem-3rem)]">
+
+        {/* Left Column: Cédula Login */}
+        <section className="space-y-10 order-2 lg:order-1">
+          <div className="max-w-sm space-y-6">
+
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold tracking-tight">Haz tu pedido</h2>
+              <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+                Ingresa tu número de cédula para consultar el menú del día y realizar tu reserva.
+              </p>
             </div>
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-xs text-slate-500 uppercase font-black tracking-widest">Menú Cacheado</p>
-              <p className="text-2xl font-bold">{menu?.items?.length || 0} items</p>
-            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                placeholder="Número de cédula"
+                value={cedula}
+                onChange={(e) => setCedula(e.target.value)}
+                required
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+              />
+              <Button type="submit" className="w-full group dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200">
+                Ingresar
+                <ChevronRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </form>
           </div>
         </section>
 
-        <section className="pt-4 space-y-3">
-          <button
-            onClick={() => createOrder({
-              userId: 'tablet-user-01',
-              items: [{ id: 'demo', name: 'Almuerzo Base', price: 15000, quantity: 1 }],
-              total: 15000,
-            })}
-            className="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition active:scale-[0.98]"
-          >
-            Crear Pedido de Prueba
-          </button>
-          <p className="text-[10px] text-slate-400 text-center italic">
-            El pedido se guardará en IndexedDB y se sincronizará automáticamente al volver el internet.
+        {/* Right Column: Brand block */}
+        <section className="space-y-6 order-1 lg:order-2 lg:border-l lg:border-zinc-100 dark:lg:border-zinc-800 lg:pl-16 py-8">
+          <h1 className="text-5xl lg:text-7xl font-black leading-[1.05] tracking-tighter">
+            TIMO.
+          </h1>
+          <p className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-md">
+            Almuerzos corporativos para tu equipo, sin complicaciones.
+            Rápido, confiable y siempre disponible.
           </p>
+          <div className="flex flex-wrap gap-8 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+            <FeatureItem title="Pedidos" desc="Rápidos y simples" />
+            <FeatureItem title="Menú diario" desc="Actualizado cada jornada" />
+            <FeatureItem title="Sin internet" desc="Disponible offline" />
+          </div>
         </section>
-      </div>
-    </main>
+
+      </main>
+
+      <footer className="fixed bottom-0 w-full border-t border-zinc-100 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-center">
+          <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-[0.2em]">
+            © 2025 TIMO — Gestión de Almuerzos Corporativos
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function FeatureItem({ title, desc }: { title: string, desc: string }) {
+  return (
+    <div className="space-y-0.5">
+      <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">{title}</p>
+      <p className="text-[11px] text-zinc-400 font-medium">{desc}</p>
+    </div>
   );
 }
