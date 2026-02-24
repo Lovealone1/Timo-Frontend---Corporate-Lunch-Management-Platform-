@@ -1,16 +1,38 @@
-export interface MenuItem {
+export interface BaseEntity {
     id: string;
     name: string;
-    description?: string;
-    price: number;
-    category: string;
-    imageUrl?: string;
+}
+
+export interface ProteinOption {
+    id: string;
+    proteinTypeId: string;
+    proteinType: BaseEntity;
+}
+
+export interface SideOption {
+    id: string;
+    sideDishId: string;
+    sideDish: BaseEntity;
 }
 
 export interface Menu {
     id: string;
     date: string;
-    items: MenuItem[];
+    dayOfWeek: string;
+    status: 'SCHEDULED' | 'SERVED';
+    soupId: string | null;
+    soup: BaseEntity | null;
+    drinkId: string | null;
+    drink: BaseEntity | null;
+    defaultProteinTypeId: string | null;
+    defaultProteinType: BaseEntity | null;
+    proteinOptions: ProteinOption[];
+    sideOptions: SideOption[];
+    createdAt: string;
+    updatedAt: string;
+    hasReservation?: boolean;
+    reservationId?: string | null;
+    reservedProteinId?: string | null;
 }
 
 export interface OrderItem {

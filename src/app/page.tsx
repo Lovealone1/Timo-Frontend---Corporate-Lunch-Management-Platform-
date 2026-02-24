@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -10,9 +11,17 @@ import { UtensilsCrossed, ChevronRight, Settings2 } from 'lucide-react';
 export default function Home() {
   const [cedula, setCedula] = useState('');
 
+  const router = useRouter();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Próximamente: Consulta de pedidos por cédula.');
+    if (!cedula) return;
+
+    // Guardar la cédula en localStorage para la sesión actual
+    localStorage.setItem('user_cedula', cedula);
+
+    // Redirigir a la página de menús (calendario)
+    router.push('/menus');
   };
 
   return (
@@ -96,7 +105,7 @@ export default function Home() {
       <footer className="fixed bottom-0 w-full border-t border-zinc-100 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-center">
           <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-[0.2em]">
-            © 2025 TIMO — Gestión de Almuerzos Corporativos
+            © 2026 TIMO — Gestión de Almuerzos Corporativos
           </p>
         </div>
       </footer>

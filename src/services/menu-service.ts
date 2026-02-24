@@ -13,11 +13,16 @@ export const menuService = {
     },
 
     /**
-     * Fetch a specific menu by its date.
+     * Fetch a specific menu by its date, optionally checking user reservation status.
      * @param date Date in YYYY-MM-DD format.
+     * @param cc Optional user document to check reservations.
      */
-    async findByDate(date: string): Promise<Menu> {
-        const { data } = await apiClient.get<Menu>(`/menus/by-date/${date}`);
+    async findByDate(date: string, cc?: string): Promise<Menu> {
+        let url = `/menus/by-date/${date}`;
+        if (cc) {
+            url = `/menus/by-date/${date}/user/${cc}`;
+        }
+        const { data } = await apiClient.get<Menu>(url);
         return data;
     },
 
