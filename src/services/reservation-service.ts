@@ -3,7 +3,7 @@ import { apiClient } from './api-client';
 export interface CreateReservationDto {
     cc: string;
     menuId: string;
-    proteinId: string;
+    proteinTypeId: string;
     sideDishId?: string;
     drinkId?: string;
 }
@@ -42,10 +42,17 @@ export const reservationService = {
     },
 
     /**
-     * Cancel an existing reservation.
+     * Update an existing reservation (e.g. change protein).
      */
-    async cancel(id: string, cc: string): Promise<ReservationResponse> {
-        const { data } = await apiClient.patch<ReservationResponse>(`/reservations/${id}/cancel`, { cc });
+    async update(id: string, dto: { cc: string; proteinTypeId: string }): Promise<ReservationResponse> {
+        const { data } = await apiClient.patch<ReservationResponse>(`/reservations/${id}`, dto);
         return data;
+    },
+
+    /**
+     * Delete an existing reservation permanently.
+     */
+    async deleteReservation(id: string, cc: string): Promise<void> {
+        await apiClient.delete(`/reservations/${id}`, { params: { cc } });
     },
 };
