@@ -9,8 +9,8 @@ import { MenuCard } from '@/components/menus/MenuCard';
 import { menuService } from '@/services/menu-service';
 import { Menu } from '@/types';
 
-// Helper to get Mon-Sat for the designated week based on Colombia time
-function getCurrentWeekDays(offsetWeeks: number = 0): Date[] {
+// Helper to get Mon-Sat for the current week based on Colombia time
+function getCurrentWeekDays(): Date[] {
     const today = new Date();
     // Use local time approximations for now, assuming user is in Colombia
     const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday
@@ -18,7 +18,7 @@ function getCurrentWeekDays(offsetWeeks: number = 0): Date[] {
     // Calculate difference to Monday. If Sunday (0), Monday is -6. Otherwise day - 1.
     const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     const monday = new Date(today);
-    monday.setDate(today.getDate() + diffToMonday + (offsetWeeks * 7));
+    monday.setDate(today.getDate() + diffToMonday);
     monday.setHours(0, 0, 0, 0);
 
     const days: Date[] = [];
@@ -33,7 +33,6 @@ function getCurrentWeekDays(offsetWeeks: number = 0): Date[] {
 export default function MenusPage() {
     const router = useRouter();
     const [cedula, setCedula] = useState<string | null>(null);
-    const [weekOffset, setWeekOffset] = useState<number>(0);
     const [weekDays, setWeekDays] = useState<Date[]>([]);
     const [menus, setMenus] = useState<Record<string, Menu | null>>({});
     const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
@@ -64,11 +63,11 @@ export default function MenusPage() {
         }
         setCedula(storedCedula);
 
-        const days = getCurrentWeekDays(weekOffset);
+        const days = getCurrentWeekDays();
         setWeekDays(days);
 
         days.forEach(day => fetchDayMenu(day, storedCedula));
-    }, [router, weekOffset]);
+    }, [router]);
 
     const handleLogout = () => {
         localStorage.removeItem('user_cedula');
@@ -118,34 +117,16 @@ export default function MenusPage() {
             </header>
 
             <main className="flex-1 w-full px-4 lg:px-8 py-8 flex flex-col gap-8">
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                    <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-3 text-zinc-400">
-                            <CalendarDays size={20} />
-                            <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-                                Menú Semanal
-                            </h1>
-                        </div>
-                        <p className="text-zinc-500 dark:text-zinc-400 text-sm">
-                            Selecciona o visualiza el menú disponible para {weekOffset === 0 ? 'esta' : 'la próxima'} semana.
-                        </p>
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-3 text-zinc-400">
+                        <CalendarDays size={20} />
+                        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+                            Menú Semanal
+                        </h1>
                     </div>
-
-                    {/* Week Toggle */}
-                    <div className="flex items-center bg-zinc-200/50 dark:bg-zinc-800/50 p-1 rounded-lg self-start sm:self-auto w-full sm:w-auto mt-2 sm:mt-0">
-                        <button
-                            onClick={() => setWeekOffset(0)}
-                            className={`flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all duration-200 ${weekOffset === 0 ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-                        >
-                            Esta semana
-                        </button>
-                        <button
-                            onClick={() => setWeekOffset(1)}
-                            className={`flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all duration-200 ${weekOffset === 1 ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-                        >
-                            Próxima semana
-                        </button>
-                    </div>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+                        Selecciona o visualiza el menú disponible para esta semana.
+                    </p>
                 </div>
 
                 {/* Calendar Layout: Scroll mobile, Grid desktop */}

@@ -25,12 +25,18 @@ export function MenuCard({ date, menu, isLoading, cedula, onReservationSuccess }
     const [showTicket, setShowTicket] = useState(false);
     const [reservationError, setReservationError] = useState<string | null>(null);
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isTomorrowOrLater = date.getTime() > today.getTime();
+
     // Initialize the selected protein if there is a reservation
     useEffect(() => {
         if (menu?.reservedProteinId) {
             setSelectedProteinId(menu.reservedProteinId);
+        } else if (menu?.defaultProteinType && !isTomorrowOrLater) {
+            setSelectedProteinId(menu.defaultProteinType.id);
         }
-    }, [menu?.reservedProteinId]);
+    }, [menu?.reservedProteinId, menu?.defaultProteinType, isTomorrowOrLater]);
 
     const dayName = DAYS[date.getDay()];
     const dateString = `${date.getDate()} de ${MONTHS[date.getMonth()]}`;
@@ -219,67 +225,71 @@ export function MenuCard({ date, menu, isLoading, cedula, onReservationSuccess }
         <div className="flex flex-col w-full h-full pb-4">
             <Card className={`h-[480px] sm:h-[500px] flex flex-col w-full min-w-0 overflow-hidden border-zinc-200 dark:border-zinc-800 shadow-sm transition-all duration-200 ${isServed ? 'bg-zinc-50 dark:bg-zinc-950 opacity-70 grayscale-[0.2]' : 'bg-white dark:bg-zinc-900 ' + (showReservedState ? 'border-zinc-300 dark:border-zinc-700' : 'hover:shadow-md')}`}>
                 <CardHeader className={`pb-1 pt-4 border-b border-zinc-100 dark:border-zinc-800 flex flex-row !items-center justify-between gap-2 px-4 !grid-none !auto-rows-auto min-h-[62px] ${showReservedState ? 'bg-zinc-100 dark:bg-zinc-800/80' : 'bg-zinc-50 dark:bg-zinc-900/50'}`}>
-                    <div className="flex flex-col justify-center">
-                        <CardTitle className={`text-lg font-bold tracking-tight leading-none ${isServed ? 'text-zinc-500' : 'text-zinc-900 dark:text-zinc-100'}`}>
-                            {dayName}
-                        </CardTitle>
-                        <CardDescription className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mt-1">
+                    <div className="flex flex-col justify-center flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                            <CardTitle className={`text-lg font-bold tracking-tight leading-none truncate ${isServed ? 'text-zinc-500' : 'text-zinc-900 dark:text-zinc-100'}`}>
+                                {dayName}
+                            </CardTitle>
+                            {showReservedState && (
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full shrink-0">
+                                    Reservaste
+                                </span>
+                            )}
+                            {isServed && (
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 bg-zinc-200/50 dark:bg-zinc-800/50 px-2 py-0.5 rounded-full shrink-0">
+                                    Servido
+                                </span>
+                            )}
+                            {isEditing && (
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-950/50 px-2 py-0.5 rounded-full shrink-0">
+                                    Editando
+                                </span>
+                            )}
+                        </div>
+                        <CardDescription className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mt-1 truncate">
                             {dateString}
                         </CardDescription>
                     </div>
 
                     <div className="flex items-center justify-end gap-2 shrink-0">
-                        {isServed && (
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 bg-zinc-200/50 dark:bg-zinc-800/50 px-2 py-1 rounded-full">
-                                Servido
-                            </span>
-                        )}
-
                         {showReservedState && (
-                            <>
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/50 px-2 py-1 rounded-full">
-                                    Reservaste
-                                </span>
-                                <div className="flex bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md overflow-hidden disabled:opacity-50">
-                                    <button
-                                        onClick={() => setShowTicket(true)}
-                                        disabled={isDeleting}
-                                        className="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                                        title="Ver ticket de reserva"
-                                    >
-                                        <ReceiptText size={14} />
-                                    </button>
-                                    <div className="w-px bg-zinc-200 dark:bg-zinc-700"></div>
-                                    <button
-                                        onClick={() => setIsEditing(true)}
-                                        disabled={isDeleting}
-                                        className="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                                        title="Editar reserva"
-                                    >
-                                        <Pencil size={14} />
-                                    </button>
-                                    <div className="w-px bg-zinc-200 dark:bg-zinc-700"></div>
-                                    <button
-                                        onClick={() => setShowDeleteConfirm(true)}
-                                        disabled={isDeleting}
-                                        className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
-                                        title="Eliminar reserva"
-                                    >
-                                        {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                                    </button>
-                                </div>
-                            </>
-                        )}
-
-                        {isEditing && (
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-950/50 px-2 py-1 rounded-full">
-                                Editando
-                            </span>
+                            <div className="flex bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md overflow-hidden disabled:opacity-50">
+                                <button
+                                    onClick={() => setShowTicket(true)}
+                                    disabled={isDeleting}
+                                    className="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                                    title="Ver ticket de reserva"
+                                >
+                                    <ReceiptText size={14} />
+                                </button>
+                                {isTomorrowOrLater && (
+                                    <>
+                                        <div className="w-px bg-zinc-200 dark:bg-zinc-700"></div>
+                                        <button
+                                            onClick={() => setIsEditing(true)}
+                                            disabled={isDeleting}
+                                            className="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                                            title="Editar reserva"
+                                        >
+                                            <Pencil size={14} />
+                                        </button>
+                                        <div className="w-px bg-zinc-200 dark:bg-zinc-700"></div>
+                                        <button
+                                            onClick={() => setShowDeleteConfirm(true)}
+                                            disabled={isDeleting}
+                                            className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
+                                            title="Eliminar reserva"
+                                        >
+                                            {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                                        </button>
+                                    </>
+                                )}
+                            </div>
                         )}
                     </div>
                 </CardHeader>
 
-                <CardContent className="flex-1 p-0 flex flex-col justify-center divide-y divide-zinc-100 dark:divide-zinc-800">
+                <CardContent className="flex-1 p-0 flex flex-col divide-y divide-zinc-100 dark:divide-zinc-800 overflow-y-auto min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     {/* Bebida Block */}
                     <div className={`p-4 flex flex-col gap-2 transition-colors ${!isLocked && 'group hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}`}>
                         <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500 mb-1">
@@ -297,6 +307,11 @@ export function MenuCard({ date, menu, isLoading, cedula, onReservationSuccess }
                             <Drumstick size={14} />
                             <span className="text-xs font-bold uppercase tracking-widest">Proteínas</span>
                         </div>
+                        {!isTomorrowOrLater && !isServed && !hasReservation && (
+                            <p className="text-[10px] text-orange-500 dark:text-orange-400 leading-tight">
+                                Para reservas de hoy o pasadas, se asigna la proteína por defecto.
+                            </p>
+                        )}
                         {allProteins.length > 0 ? (
                             <div className="space-y-2 mt-1">
                                 {allProteins.map((p) => {
@@ -317,11 +332,13 @@ export function MenuCard({ date, menu, isLoading, cedula, onReservationSuccess }
                                         }
                                     }
 
+                                    const isProteinSelectionLocked = isLocked || (!isTomorrowOrLater && !showReservedState);
+
                                     return (
                                         <button
                                             key={p.id}
-                                            onClick={() => !isLocked && setSelectedProteinId(prev => prev === p.id ? null : p.id)}
-                                            disabled={isLocked}
+                                            onClick={() => !isProteinSelectionLocked && setSelectedProteinId(prev => prev === p.id ? null : p.id)}
+                                            disabled={isProteinSelectionLocked}
                                             className={`w-full flex items-center justify-between text-left text-sm font-medium py-2 rounded-md border transition-all ${buttonClass}`}
                                         >
                                             <span className="flex items-center gap-2">
