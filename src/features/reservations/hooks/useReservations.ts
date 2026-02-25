@@ -4,11 +4,14 @@ import { apiClient } from '@/services/api-client';
 export interface ReservationResponse {
     id: string;
     cc: string;
-    date: string;
+    name: string;
+    whitelistEntryId?: string;
     proteinTypeId: string;
     proteinType: { id: string; name: string };
     menuId: string;
-    status: 'RESERVADA' | 'SERVIDA' | 'CANCELADA';
+    menu: { id: string; date: string; dayOfWeek: string };
+    status: 'RESERVADA' | 'SERVIDA' | 'CANCELADA' | 'AUTO_ASIGNADA';
+    sideDishes?: any[];
     createdAt: string;
     updatedAt: string;
 }
@@ -42,6 +45,20 @@ export function useReservationSummary(date: string) {
             return data;
         },
         enabled: !!date,
+    });
+}
+
+export function useReservationsByDate(date: string) {
+    return useQuery({
+        queryKey: ['/reservations', { date, take: 500 }],
+        queryFn: async () => {
+            const { data } = await apiClient.get<ReservationResponse[]>(`/reservations`, {
+                params: { date, take: 500 }
+            });
+            return data;
+        },
+        enabled: !!date,
+        staleTime: 1000 * 60 * 60, // 1 hora de cache (ayuda modo offline / sin internet una vez cargado)
     });
 }
 

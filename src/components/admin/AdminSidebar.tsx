@@ -11,6 +11,7 @@ import {
     CalendarCheck,
     ShieldCheck,
     Users,
+    Printer,
     X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -77,7 +78,7 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
             ]
         },
         {
-            title: 'Futuros Módulos',
+            title: 'Operaciones',
             items: [
                 {
                     title: 'Menús',
@@ -90,6 +91,12 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
                     href: '/admin/reservations',
                     icon: <CalendarCheck size={18} />,
                     isActive: pathname.startsWith('/admin/reservations')
+                },
+                {
+                    title: 'Tickets',
+                    href: '/tickets',
+                    icon: <Printer size={18} />,
+                    isActive: pathname.startsWith('/tickets')
                 },
                 {
                     title: 'Empleados',

@@ -6,22 +6,34 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { UtensilsCrossed, ChevronRight, Settings2 } from 'lucide-react';
+import { UtensilsCrossed, ChevronRight, Settings2, Loader2, AlertCircle } from 'lucide-react';
+import { whitelistService } from '@/services/whitelist-service';
 
 export default function Home() {
   const [cedula, setCedula] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cedula) return;
 
-    // Guardar la cédula en localStorage para la sesión actual
-    localStorage.setItem('user_cedula', cedula);
+    setIsLoading(true);
+    setError('');
 
-    // Redirigir a la página de menús (calendario)
-    router.push('/menus');
+    try {
+      await whitelistService.loginByCc(cedula);
+      // Guardar también en localStorage por compatibilidad
+      localStorage.setItem('user_cedula', cedula);
+      // Redirigir a la página de menús (calendario)
+      router.push('/menus');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Error al verificar la cédula');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -70,15 +82,37 @@ export default function Home() {
               <Input
                 placeholder="Número de cédula"
                 value={cedula}
-                onChange={(e) => setCedula(e.target.value)}
+                onChange={(e) => {
+                  setCedula(e.target.value);
+                  if (error) setError('');
+                }}
                 required
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
+                disabled={isLoading}
+                className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
               />
-              <Button type="submit" className="w-full group dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200">
-                Ingresar
-                <ChevronRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+
+              {error && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950/50 rounded-lg flex items-start gap-2 border border-red-200 dark:border-red-900/30">
+                  <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <Button type="submit" disabled={isLoading} className="w-full group dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200">
+                {isLoading ? (
+                  <>
+                    <Loader2 size={16} className="mr-2 animate-spin" />
+                    Verificando...
+                  </>
+                ) : (
+                  <>
+                    Ingresar
+                    <ChevronRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
               </Button>
             </form>
           </div>
