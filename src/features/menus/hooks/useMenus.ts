@@ -26,6 +26,17 @@ export function useMenusList(skip: number = 0, take: number = 50) {
     });
 }
 
+export function useMenusByDateRange(startDate: string, endDate: string) {
+    return useQuery({
+        queryKey: ['/menus', startDate, endDate],
+        queryFn: async () => {
+            const { data } = await apiClient.get<MenuResponse[]>(`/menus?startDate=${startDate}&endDate=${endDate}&take=7`);
+            return data;
+        },
+        enabled: !!startDate && !!endDate,
+    });
+}
+
 export function useMenuCreate() {
     const queryClient = useQueryClient();
     return useMutation({
@@ -88,7 +99,16 @@ export function useMenuClone() {
 export function useMenuUpdate() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, payload }: { id: string; payload: { proteinOptionIds?: string[] } }) => {
+        mutationFn: async ({ id, payload }: {
+            id: string;
+            payload: {
+                soupId?: string;
+                drinkId?: string;
+                defaultProteinTypeId?: string;
+                proteinOptionIds?: string[];
+                sideOptionIds?: string[];
+            }
+        }) => {
             const { data } = await apiClient.patch(`/menus/${id}`, payload);
             return data;
         },

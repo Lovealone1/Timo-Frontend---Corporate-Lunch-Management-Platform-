@@ -37,7 +37,7 @@ export function MenuCloneDialog({ isOpen, onClose, onConfirm, isLoading, sourceD
                 <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-3 text-zinc-900 dark:text-zinc-100">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-500">
+                            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
                                 <Calendar size={20} />
                             </div>
                             <h3 className="text-lg font-bold">Clonar Menú</h3>
@@ -80,7 +80,7 @@ export function MenuCloneDialog({ isOpen, onClose, onConfirm, isLoading, sourceD
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+                                className="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
                             >
                                 {isLoading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                                 Confirmar Clonado

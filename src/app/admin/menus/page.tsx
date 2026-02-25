@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { MenusPage } from '@/features/menus/components/MenusPage';
+import { MenusCalendarPage } from '@/features/menus/components/calendar/MenusCalendarPage';
 
 export default function AdminMenusRoute() {
-    return <MenusPage />;
+    return <MenusCalendarPage />;
 }

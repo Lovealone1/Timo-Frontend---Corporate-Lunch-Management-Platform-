@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { authService } from '@/services/auth-service';
-import { UtensilsCrossed, AlertCircle, ArrowLeft } from 'lucide-react';
+import { UtensilsCrossed, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -96,9 +96,16 @@ export default function AdminLoginPage() {
                         <Button
                             type="submit"
                             className="w-full h-12 text-base mt-2"
-                            isLoading={isLoading}
+                            disabled={isLoading}
                         >
-                            Entrar
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Entrando...
+                                </>
+                            ) : (
+                                "Entrar"
+                            )}
                         </Button>
                     </form>
                 </div>
