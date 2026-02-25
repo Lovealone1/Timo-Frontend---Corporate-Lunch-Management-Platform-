@@ -10,7 +10,8 @@ import {
     Utensils,
     CalendarCheck,
     ShieldCheck,
-    Users
+    Users,
+    X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -26,7 +27,12 @@ interface NavSection {
     items: NavItem[];
 }
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
     const pathname = usePathname();
 
     const sections: NavSection[] = [
@@ -102,33 +108,53 @@ export function AdminSidebar() {
     ];
 
     return (
-        <aside className="w-64 border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hidden md:flex flex-col h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto">
-            <div className="p-4 space-y-6">
-                {sections.map((section, idx) => (
-                    <div key={idx}>
-                        <h4 className="px-3 mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                            {section.title}
-                        </h4>
-                        <nav className="space-y-1">
-                            {section.items.map((item) => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={cn(
-                                        "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                                        item.isActive
-                                            ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"
-                                            : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-800"
-                                    )}
-                                >
-                                    {item.icon}
-                                    {item.title}
-                                </Link>
-                            ))}
-                        </nav>
-                    </div>
-                ))}
-            </div>
-        </aside>
+        <>
+            {/* Mobile Backdrop */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 z-40 bg-zinc-950/50 backdrop-blur-sm md:hidden"
+                    onClick={onClose}
+                />
+            )}
+
+            {/* Sidebar */}
+            <aside className={cn(
+                "fixed inset-y-0 left-0 z-50 w-64 border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:h-[calc(100vh-4rem)] md:sticky md:top-16",
+                isOpen ? "translate-x-0" : "-translate-x-full"
+            )}>
+                <div className="flex items-center justify-between p-4 md:hidden border-b border-zinc-200 dark:border-zinc-800">
+                    <span className="font-black tracking-tighter text-xl text-zinc-900 dark:text-white">TIMO. Menú</span>
+                    <button onClick={onClose} className="p-1 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+                        <X size={20} />
+                    </button>
+                </div>
+                <div className="p-4 space-y-6 overflow-y-auto flex-1">
+                    {sections.map((section, idx) => (
+                        <div key={idx}>
+                            <h4 className="px-3 mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                                {section.title}
+                            </h4>
+                            <nav className="space-y-1">
+                                {section.items.map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className={cn(
+                                            "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                                            item.isActive
+                                                ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"
+                                                : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-800"
+                                        )}
+                                    >
+                                        {item.icon}
+                                        {item.title}
+                                    </Link>
+                                ))}
+                            </nav>
+                        </div>
+                    ))}
+                </div>
+            </aside>
+        </>
     );
 }

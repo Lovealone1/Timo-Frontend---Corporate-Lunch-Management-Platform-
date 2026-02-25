@@ -10,6 +10,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const router = useRouter();
     const pathname = usePathname();
     const [isLoading, setIsLoading] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Close mobile menu on route change
+    useEffect(() => {
+        setIsMobileMenuOpen(false);
+    }, [pathname]);
 
     // Exclude login page from this layout's auth check logic
     const isLoginPage = pathname === '/admin/login';
@@ -50,11 +56,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     return (
         <div className="min-h-screen bg-white dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 selection:bg-zinc-200 dark:selection:bg-zinc-800">
-            <AdminHeader />
+            <AdminHeader onMenuToggle={() => setIsMobileMenuOpen(true)} />
 
             <div className="flex pt-16 max-w-[1600px] mx-auto">
-                <AdminSidebar />
-                <main className="flex-1 min-h-[calc(100vh-4rem)] p-6 overflow-x-hidden">
+                <AdminSidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+                <main className="flex-1 min-h-[calc(100vh-4rem)] p-4 sm:p-6 overflow-x-hidden">
                     {children}
                 </main>
             </div>

@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { UtensilsCrossed, LogOut } from 'lucide-react';
+import { UtensilsCrossed, LogOut, Menu } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { authService, UserProfile } from '@/services/auth-service';
 import { useRouter } from 'next/navigation';
 
-export function AdminHeader() {
+export function AdminHeader({ onMenuToggle }: { onMenuToggle?: () => void }) {
     const router = useRouter();
     const [profile, setProfile] = useState<UserProfile | null>(null);
 
@@ -27,8 +27,11 @@ export function AdminHeader() {
             <div className="max-w-[1600px] mx-auto px-6 h-full flex items-center justify-between">
 
                 {/* Brand */}
-                <div className="flex items-center gap-3 w-60">
-                    <UtensilsCrossed size={16} className="text-zinc-500 dark:text-zinc-400" />
+                <div className="flex items-center gap-3 w-auto md:w-60">
+                    <button onClick={onMenuToggle} className="md:hidden p-1.5 -ml-1.5 mr-1 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-md">
+                        <Menu size={20} />
+                    </button>
+                    <UtensilsCrossed size={16} className="text-zinc-500 dark:text-zinc-400 hidden sm:block" />
                     <span className="font-black tracking-tighter text-2xl text-zinc-900 dark:text-white leading-none">TIMO.</span>
                     <span className="text-zinc-500 text-xs hidden sm:block">/ Admin</span>
                 </div>
