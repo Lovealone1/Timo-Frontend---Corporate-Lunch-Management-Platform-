@@ -229,7 +229,7 @@ export function MenusPage() {
 
                     <button
                         onClick={() => setCreateDialog({ isOpen: true })}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg text-sm font-medium transition-colors"
                     >
                         <Plus size={16} />
                         Crear Menú

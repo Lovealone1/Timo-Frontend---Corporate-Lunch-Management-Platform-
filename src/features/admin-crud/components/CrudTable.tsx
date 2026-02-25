@@ -11,6 +11,7 @@ interface CrudTableProps<T> {
         pageSize: number;
         onPageChange: (page: number) => void;
         hasMore?: boolean;
+        totalElements?: number;
     };
 }
 
@@ -64,6 +65,11 @@ export function CrudTable<T>({ data, columns, isLoading, pagination }: CrudTable
                 <div className="flex items-center justify-between px-6 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
                     <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                         Página {pagination.page + 1}
+                        {pagination.totalElements !== undefined && (
+                            <span className="ml-1">
+                                de {Math.max(1, Math.ceil(pagination.totalElements / Math.max(1, pagination.pageSize)))} ({pagination.totalElements} registros)
+                            </span>
+                        )}
                     </span>
                     <div className="flex items-center gap-1">
                         <button

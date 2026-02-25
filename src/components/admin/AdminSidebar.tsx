@@ -92,7 +92,7 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
                     isActive: pathname.startsWith('/admin/reservations')
                 },
                 {
-                    title: 'Whitelist',
+                    title: 'Empleados',
                     href: '/admin/whitelist',
                     icon: <ShieldCheck size={18} />,
                     isActive: pathname.startsWith('/admin/whitelist')
